@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Smart Ration Dashboard</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+body{
+margin:0;
+font-family:Arial;
+background:#48a905;
+}
+
+.container{
+padding:20px;
+color:white;
+position:relative;
+}
+
+.logout{
+position:absolute;
+top:20px;
+right:20px;
+background:#f44336;
+color:white;
+border:none;
+padding:8px 15px;
+border-radius:6px;
+cursor:pointer;
+}
+
+.logout:hover{ background:#d32f2f; }
+
+.welcome{ font-size:22px; }
+.admin{ font-weight:bold; font-size:28px; margin-bottom:20px; }
+
+.row{
+display:flex;
+gap:20px;
+margin-bottom:20px;
+}
+
+.card{
+flex:1;
+background:white;
+padding:20px;
+border-radius:12px;
+text-align:center;
+box-shadow:0 4px 15px rgba(0,0,0,0.2);
+cursor:pointer;
+transition:0.3s;
+}
+
+.card:hover{ transform:translateY(-5px); }
+.active{ border:3px solid #ffd700; }
+
+.card i{ font-size:32px; margin-bottom:10px; }
+.card h4{ margin:5px 0; color:black; }
+
+.count{
+font-size:22px;
+font-weight:bold;
+color:#333;
+}
+
+.overview i{ color:#4caf50; }
+.shops i{ color:#ff9800; }
+.users i{ color:#2196f3; }
+.txns i{ color:#e91e63; }
+
+.fps i{ color:#9c27b0; }
+.benef i{ color:#00bcd4; }
+.trans i{ color:#3f51b5; }
+.low i{ color:#f44336; }
+
+.section{
+background:white;
+padding:20px;
+border-radius:12px;
+box-shadow:0 4px 15px rgba(0,0,0,0.2);
+color:black;
+margin-top:20px;
+}
+
+.progress{
+background:#eee;
+border-radius:20px;
+overflow:hidden;
+margin:10px 0;
+}
+
+.bar{
+height:20px;
+width:0%;
+transition:2s;
+}
+
+.rice{ background:#4caf50; }
+.wheat{ background:#ff9800; }
+.sugar{ background:#e91e63; }
+.oil{ background:#3f51b5; }
+
+.txn{
+display:flex;
+justify-content:space-between;
+border-bottom:1px solid #ccc;
+padding:10px 0;
+}
+
+.txn-card{
+display:flex;
+justify-content:space-between;
+background:#f9f9f9;
+padding:15px;
+border-radius:10px;
+margin-bottom:20px;
+box-shadow:0 3px 10px rgba(0,0,0,0.2);
+}
+
+.shop-card,.user-card{
+background:#f9f9f9;
+padding:15px;
+border-radius:10px;
+position:relative;
+box-shadow:0 3px 10px rgba(0,0,0,0.2);
+margin-bottom:20px;
+}
+
+.delete-icon{
+position:absolute;
+top:15px;
+right:15px;
+color:red;
+cursor:pointer;
+}
+
+.user-card input{
+padding:5px;
+border-radius:5px;
+border:1px solid #ccc;
+}
+
+.tag{
+padding:5px 10px;
+border-radius:6px;
+font-size:12px;
+font-weight:bold;
+margin-left:10px;
+color:white;
+}
+
+.aay{ background:#4caf50; }
+
+</style>
+</head>
+
+<body onload="loadData()">
+
+<div class="container">
+
+<button class="logout" onclick="logout()">Logout</button>
+
+<div class="welcome">Welcome back, <span id="adminName"></span></div>
+<div class="admin">System Admin</div>
+
+<!-- TOP MENU -->
+<div class="row">
+<div class="card overview active" onclick="showOverview()">
+<i class="fa fa-chart-line"></i>
+<h4>Overview</h4>
+</div>
+
+<div class="card shops" onclick="showShops()">
+<i class="fa fa-store"></i>
+<h4>Shops</h4>
+</div>
+
+<div class="card users" onclick="showUsers()">
+<i class="fa fa-users"></i>
+<h4>Users</h4>
+</div>
+
+<div class="card txns" onclick="showTransactions()">
+<i class="fa fa-receipt"></i>
+<h4>Transactions</h4>
+</div>
+</div>
+
+<div class="section">
+
+<!-- OVERVIEW -->
+<div id="overviewSection">
+
+<div class="row">
+<div class="card fps">
+<i class="fa fa-warehouse"></i>
+<h4>FPS Shops</h4>
+<div class="count" id="fpsCount">0</div>
+</div>
+
+<div class="card benef">
+<i class="fa fa-user-friends"></i>
+<h4>Beneficiaries</h4>
+<div class="count" id="benefCount">0</div>
+</div>
+</div>
+
+<div class="row">
+<div class="card trans">
+<i class="fa fa-exchange-alt"></i>
+<h4>Transactions</h4>
+<div class="count" id="txnCount">0</div>
+</div>
+
+<div class="card low">
+<i class="fa fa-exclamation-triangle"></i>
+<h4>Low Stocks</h4>
+<div class="count" id="lowCount">0</div>
+</div>
+</div>
+
+<h3>Stock Overview</h3>
+
+Rice (650/1000kg)
+<div class="progress"><div class="bar rice" id="rice"></div></div>
+
+Wheat (730/1200kg)
+<div class="progress"><div class="bar wheat" id="wheat"></div></div>
+
+Sugar (200/300kg)
+<div class="progress"><div class="bar sugar" id="sugar"></div></div>
+
+Oil (150/200L)
+<div class="progress"><div class="bar oil" id="oil"></div></div>
+
+<!-- Recent Transactions Added -->
+<h3 style="margin-top:30px;">Recent Transactions</h3>
+
+<div class="txn">
+<div><b>TXN003</b><br>Ravi Kumar<br>26-02-2026</div>
+<div>Rice 5kg<br>Sugar 1kg</div>
+</div>
+
+<div class="txn">
+<div><b>TXN004</b><br>Sita Devi<br>25-02-2026</div>
+<div>Wheat 3kg<br>Oil 1L</div>
+</div>
+
+<div class="txn">
+<div><b>TXN005</b><br>Rahul<br>24-02-2026</div>
+<div>Rice 2kg</div>
+</div>
+
+</div>
+
+<!-- SHOPS -->
+<div id="shopsSection" style="display:none;">
+<input type="text" placeholder="🔍 Search Shop..."
+style="width:100%;padding:10px;margin-bottom:20px;border-radius:8px;border:1px solid #ccc;">
+
+<div class="shop-card">
+<i class="fa fa-trash delete-icon" onclick="deleteShop(this)"></i>
+<div style="display:flex;gap:15px;">
+<i class="fa fa-store" style="font-size:40px;color:#ff9800;"></i>
+<div>
+<h3>Meena Fair Price Shop</h3>
+<p>Gandhi Nagar, Ward 12</p>
+Owner:
+<input type="text" value="Ramesh Kumar">
+</div>
+</div>
+</div>
+</div>
+
+<!-- USERS -->
+<div id="usersSection" style="display:none;">
+<input type="text" placeholder="🔍 Search User..."
+style="width:100%;padding:10px;margin-bottom:20px;border-radius:8px;border:1px solid #ccc;">
+
+<div class="user-card">
+<i class="fa fa-trash delete-icon" onclick="deleteUser(this)"></i>
+<div style="display:flex;gap:15px;">
+<i class="fa fa-user-circle" style="font-size:45px;color:#2196f3;"></i>
+<div style="flex:1;">
+Username: <input type="text" value="Ramesh"><br><br>
+RC No: <input type="text" value="123456">
+<span class="tag aay">AAY</span><br><br>
+Family: <input type="text" value="4"><br><br>
+Shop: <input type="text" value="Meena Shop">
+</div>
+</div>
+</div>
+</div>
+
+<!-- TRANSACTIONS -->
+<div id="transactionsSection" style="display:none;">
+<h3>All Transactions</h3>
+
+<div class="txn-card">
+<div>TXN001<br>Ramesh<br>25-02-2026</div>
+<div>Rice 5kg</div>
+</div>
+
+<div class="txn-card">
+<div>TXN002<br>Suresh<br>24-02-2026</div>
+<div>Wheat 3kg</div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+<script>
+function loadData(){
+document.getElementById("adminName").innerText =
+localStorage.getItem("adminName") || "Admin";
+
+document.getElementById("rice").style.width="65%";
+document.getElementById("wheat").style.width="60%";
+document.getElementById("sugar").style.width="66%";
+document.getElementById("oil").style.width="75%";
+
+document.getElementById("fpsCount").innerText=24;
+document.getElementById("benefCount").innerText=1250;
+document.getElementById("txnCount").innerText=320;
+document.getElementById("lowCount").innerText=3;
+}
+
+function logout(){
+localStorage.removeItem("adminName");
+window.location.href="index.html";
+}
+
+function hideAll(){
+overviewSection.style.display="none";
+shopsSection.style.display="none";
+usersSection.style.display="none";
+transactionsSection.style.display="none";
+}
+
+function setActive(index){
+var cards=document.querySelectorAll(".row:first-child .card");
+cards.forEach(c=>c.classList.remove("active"));
+cards[index].classList.add("active");
+}
+
+function showOverview(){ hideAll(); overviewSection.style.display="block"; setActive(0); }
+function showShops(){ hideAll(); shopsSection.style.display="block"; setActive(1); }
+function showUsers(){ hideAll(); usersSection.style.display="block"; setActive(2); }
+function showTransactions(){ hideAll(); transactionsSection.style.display="block"; setActive(3); }
+
+function deleteShop(icon){ icon.parentElement.remove(); }
+function deleteUser(icon){ icon.parentElement.remove(); }
+</script>
+
+</body>
+</html>

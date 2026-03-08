@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Admin Dashboard</title>
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+
+body{
+    margin:0;
+    font-family:Arial;
+    background:linear-gradient(to right,#2e7d32,#66bb6a);
+}
+
+/* HEADER */
+.header{
+    background:white;
+    padding:15px 20px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    box-shadow:0 3px 10px rgba(0,0,0,0.2);
+}
+
+.store-name{
+    font-size:18px;
+    font-weight:bold;
+    color:#2e7d32;
+}
+
+/* MENU */
+.menu{
+    display:flex;
+    justify-content:space-around;
+    background:#ffffff;
+    padding:10px;
+}
+
+.menu button{
+    border:none;
+    background:#e8f5e9;
+    padding:8px 15px;
+    border-radius:8px;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+.menu button.active{
+    background:#2e7d32;
+    color:white;
+}
+
+/* DASHBOARD */
+.cards{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:15px;
+    padding:20px;
+}
+
+.card{
+    background:white;
+    padding:20px;
+    border-radius:12px;
+    text-align:center;
+    box-shadow:0 5px 15px rgba(0,0,0,0.2);
+    transition: transform 0.2s;
+}
+
+.card:hover{
+    transform: translateY(-5px);
+}
+
+.card i{
+    font-size:28px;
+    margin-bottom:10px;
+}
+
+.beneficiaries i{ color:#1976d2; }
+.today i{ color:#f57c00; }
+.total i{ color:#8e24aa; }
+.license i{ color:#2e7d32; }
+
+/* CURRENT STOCK BARS */
+.stock-section{
+    background:white;
+    margin:20px;
+    padding:20px;
+    border-radius:15px;
+    box-shadow:0 5px 15px rgba(0,0,0,0.2);
+}
+
+.progress{
+    background:#eee;
+    border-radius:20px;
+    height:20px;
+    margin:10px 0 20px 0;
+    overflow:hidden;
+}
+
+.progress-bar{
+    height:100%;
+    text-align:right;
+    padding-right:10px;
+    color:white;
+    font-size:12px;
+    line-height:20px;
+    transition: width 0.5s ease;
+}
+
+.rice-bar{ background:#4caf50; }
+.wheat-bar{ background:#ff9800; }
+.sugar-bar{ background:#9c27b0; }
+.oil-bar{ background:#2196f3; }
+
+/* INVENTORY */
+.inventory-container{
+    background:white;
+    margin:20px;
+    padding:25px;
+    border-radius:15px;
+    box-shadow:0 5px 15px rgba(0,0,0,0.2);
+}
+
+.inventory-row{
+    display:flex;
+    justify-content:space-between;
+    margin:15px 0;
+    font-weight:bold;
+}
+
+.dot{
+    height:12px;
+    width:12px;
+    border-radius:50%;
+    display:inline-block;
+    margin-right:10px;
+}
+
+.rice{ background:#4caf50; }
+.wheat{ background:#ff9800; }
+.sugar{ background:#9c27b0; }
+.oil{ background:#2196f3; }
+
+/* USERS */
+.search-box{
+    padding:20px;
+}
+
+.search-box input{
+    width:100%;
+    padding:10px;
+    border-radius:25px;
+    border:1px solid #ccc;
+}
+
+.user-card{
+    background:white;
+    margin:15px 20px;
+    padding:15px;
+    border-radius:15px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    box-shadow:0 4px 12px rgba(0,0,0,0.2);
+    cursor:pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.user-card:hover{
+    transform: translateY(-3px);
+    box-shadow:0 6px 18px rgba(0,0,0,0.3);
+}
+
+.user-left{
+    display:flex;
+    gap:15px;
+    align-items:center;
+}
+
+.user-icon{
+    background:#e8f5e9;
+    padding:12px;
+    border-radius:50%;
+    color:#2e7d32;
+    font-size:18px;
+}
+
+.cart-btn{
+    background:#2e7d32;
+    color:white;
+    border:none;
+    padding:10px 15px;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+/* HISTORY */
+.history-card{
+    background:white;
+    margin:15px 20px;
+    padding:15px;
+    border-radius:15px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    box-shadow:0 4px 12px rgba(0,0,0,0.2);
+}
+
+.history-left{
+    display:flex;
+    gap:15px;
+}
+
+.section{
+    display:none;
+}
+
+/* ---- MODAL STYLING ---- */
+#allocationModal{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,0.5);
+    display:none;
+    justify-content:center;
+    align-items:center;
+    z-index:1000;
+    animation: fadeIn 0.3s ease;
+}
+
+.modal-content{
+    background:white;
+    padding:25px 30px;
+    border-radius:15px;
+    width:350px;
+    max-width:90%;
+    text-align:center;
+    box-shadow:0 10px 30px rgba(0,0,0,0.3);
+    transform: scale(0.7);
+    animation: scaleUp 0.3s forwards;
+}
+
+.modal-content h2{
+    margin-bottom:20px;
+    color:#2e7d32;
+}
+
+.modal-content input{
+    width:80%;
+    padding:10px;
+    margin:8px 0;
+    border-radius:8px;
+    border:1px solid #ccc;
+}
+
+.modal-content button{
+    margin-top:15px;
+    padding:10px 25px;
+    border:none;
+    border-radius:8px;
+    background:#2e7d32;
+    color:white;
+    font-weight:bold;
+    cursor:pointer;
+    transition: background 0.2s;
+}
+
+.modal-content button:hover{
+    background:#1b5e20;
+}
+
+@keyframes scaleUp{
+    to { transform: scale(1); }
+}
+
+@keyframes fadeIn{
+    from { opacity:0; }
+    to { opacity:1; }
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="header">
+    <div class="store-name">
+        <span id="adminName"></span> Ration Store
+    </div>
+
+    <i class="fas fa-sign-out-alt"
+       style="color:red;cursor:pointer;font-size:18px;"
+       onclick="logout()"></i>
+</div>
+
+<div class="menu">
+    <button class="active" onclick="showSection('dashboard',this)">
+        <i class="fas fa-home"></i> Dashboard
+    </button>
+    <button onclick="showSection('inventory',this)">
+        <i class="fas fa-box"></i> Inventory
+    </button>
+    <button onclick="showSection('users',this)">
+        <i class="fas fa-users"></i> Users
+    </button>
+    <button onclick="showSection('history',this)">
+        <i class="fas fa-clock"></i> History
+    </button>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboard" class="section" style="display:block;">
+
+<div class="cards">
+    <div class="card beneficiaries">
+        <i class="fas fa-users"></i>
+        <h4>Beneficiaries</h4>
+        <h2>250</h2>
+    </div>
+
+    <div class="card today">
+        <i class="fas fa-cart-shopping"></i>
+        <h4>Today's Txns</h4>
+        <h2>32</h2>
+    </div>
+
+    <div class="card total">
+        <i class="fas fa-chart-line"></i>
+        <h4>Total Txns</h4>
+        <h2>1200</h2>
+    </div>
+
+    <div class="card license">
+        <i class="fas fa-id-card"></i>
+        <h4>License</h4>
+        <h2>Active</h2>
+    </div>
+</div>
+
+<div class="stock-section">
+    <h3>Current Stocks</h3>
+
+    Rice
+    <div class="progress">
+        <div id="riceBar" class="progress-bar rice-bar">90%</div>
+    </div>
+
+    Wheat
+    <div class="progress">
+        <div id="wheatBar" class="progress-bar wheat-bar">95%</div>
+    </div>
+
+    Sugar
+    <div class="progress">
+        <div id="sugarBar" class="progress-bar sugar-bar">80%</div>
+    </div>
+
+    Oil
+    <div class="progress">
+        <div id="oilBar" class="progress-bar oil-bar">90%</div>
+    </div>
+
+</div>
+
+</div>
+
+<!-- INVENTORY -->
+<div id="inventory" class="section">
+    <div class="inventory-container">
+
+        <div class="inventory-row">
+            <div><span class="dot rice"></span>Rice</div>
+            <div id="riceStock">450 kg / 500 kg</div>
+        </div>
+
+        <div class="inventory-row">
+            <div><span class="dot wheat"></span>Wheat</div>
+            <div id="wheatStock">380 kg / 400 kg</div>
+        </div>
+
+        <div class="inventory-row">
+            <div><span class="dot sugar"></span>Sugar</div>
+            <div id="sugarStock">120 kg / 150 kg</div>
+        </div>
+
+        <div class="inventory-row">
+            <div><span class="dot oil"></span>Oil</div>
+            <div id="oilStock">90 L / 100 L</div>
+        </div>
+
+        <div class="allocation-box">
+            <b>Allocation Details</b><br><br>
+            Monthly allocation is managed by the admin.<br>
+            Stock auto-deducts after each distribution.<br>
+            Contact admin when stock goes below 25%.
+        </div>
+
+    </div>
+</div>
+
+<!-- USERS -->
+<div id="users" class="section">
+
+<div class="search-box">
+    <input type="text" placeholder="Search User..." id="userSearch" onkeyup="filterUsers()">
+</div>
+
+<div id="usersList">
+    <div class="user-card" onclick="openAllocationModal(this)">
+        <div class="user-left">
+            <div class="user-icon"><i class="fas fa-user"></i></div>
+            <div>
+                <b>Ravi Kumar</b><br>
+                RC-2024-00001<br>
+                Family: 5 | AAY
+            </div>
+        </div>
+        <button class="cart-btn"><i class="fas fa-cart-shopping"></i></button>
+    </div>
+
+    <div class="user-card" onclick="openAllocationModal(this)">
+        <div class="user-left">
+            <div class="user-icon"><i class="fas fa-user"></i></div>
+            <div>
+                <b>Sita Devi</b><br>
+                RC-2024-00002<br>
+                Family: 3 | PHH
+            </div>
+        </div>
+        <button class="cart-btn"><i class="fas fa-cart-shopping"></i></button>
+    </div>
+</div>
+
+</div>
+
+<!-- HISTORY -->
+<div id="history" class="section">
+
+<div class="search-box">
+    <input type="text" placeholder="Search Transaction..." id="txnSearch" onkeyup="filterTxns()">
+</div>
+
+<div id="historyList">
+<!-- Transaction cards will be added here dynamically -->
+</div>
+
+</div>
+
+<!-- MODAL -->
+<div id="allocationModal">
+    <div class="modal-content">
+        <h2>Allocate Items</h2>
+        <div id="modalUserName" style="margin-bottom:15px;font-weight:bold;color:#2e7d32;"></div>
+        Rice (kg): <input type="number" id="modalRice" min="0"><br>
+        Wheat (kg): <input type="number" id="modalWheat" min="0"><br>
+        Sugar (kg): <input type="number" id="modalSugar" min="0"><br>
+        Oil (L): <input type="number" id="modalOil" min="0"><br>
+        <button onclick="confirmAllocationModal()">Confirm</button>
+    </div>
+</div>
+
+<script>
+document.getElementById("adminName").innerText =
+localStorage.getItem("username") || "Admin";
+
+function logout(){
+    localStorage.removeItem("username");
+    window.location.href="index.html";
+}
+
+function showSection(sectionId,btn){
+    document.querySelectorAll('.section').forEach(sec=>{
+        sec.style.display="none";
+    });
+    document.getElementById(sectionId).style.display="block";
+    document.querySelectorAll('.menu button').forEach(b=>{
+        b.classList.remove("active");
+    });
+    btn.classList.add("active");
+}
+
+/* USERS MODAL LOGIC */
+let currentUser = null;
+let historyData = [];
+
+function openAllocationModal(userCard){
+    const nameDiv = userCard.querySelector(".user-left div b");
+    const username = nameDiv.innerText;
+    currentUser = username;
+    document.getElementById("modalUserName").innerText = username;
+    document.getElementById("modalRice").value = "";
+    document.getElementById("modalWheat").value = "";
+    document.getElementById("modalSugar").value = "";
+    document.getElementById("modalOil").value = "";
+    document.getElementById("allocationModal").style.display = "flex";
+}
+
+function confirmAllocationModal(){
+    const rice = parseInt(document.getElementById("modalRice").value)||0;
+    const wheat = parseInt(document.getElementById("modalWheat").value)||0;
+    const sugar = parseInt(document.getElementById("modalSugar").value)||0;
+    const oil = parseInt(document.getElementById("modalOil").value)||0;
+    
+    if(!currentUser){
+        alert("Select a user first!");
+        return;
+    }
+
+    deductStock(rice,wheat,sugar,oil);
+
+    const txnId = "TXN-"+String(historyData.length+1).padStart(5,'0');
+    const date = new Date().toLocaleDateString('en-GB');
+    const txn = {txnId,user:currentUser,date,rice,wheat,sugar,oil};
+    historyData.push(txn);
+    addHistoryCard(txn);
+
+    document.getElementById("allocationModal").style.display = "none";
+    currentUser = null;
+}
+
+/* HISTORY CARD */
+function addHistoryCard(txn){
+    const historyDiv = document.getElementById("historyList");
+    const card = document.createElement("div");
+    card.className = "history-card";
+    card.innerHTML = `
+        <div class="history-left">
+            <div class="user-icon"><i class="fas fa-file"></i></div>
+            <div>
+                <b>${txn.txnId}</b><br>
+                ${txn.user}<br>
+                ${txn.date}
+            </div>
+        </div>
+        <div>
+            R:${txn.rice} W:${txn.wheat}<br>
+            S:${txn.sugar} O:${txn.oil}
+        </div>
+    `;
+    historyDiv.appendChild(card);
+}
+
+/* STOCK MANAGEMENT */
+let stock = {rice:450,riceMax:500,wheat:380,wheatMax:400,sugar:120,sugarMax:150,oil:90,oilMax:100};
+
+function deductStock(rice,wheat,sugar,oil){
+    stock.rice -= rice;
+    stock.wheat -= wheat;
+    stock.sugar -= sugar;
+    stock.oil -= oil;
+    updateStockUI();
+}
+
+function updateStockUI(){
+    document.getElementById("riceStock").innerText = stock.rice+" kg / "+stock.riceMax+" kg";
+    document.getElementById("wheatStock").innerText = stock.wheat+" kg / "+stock.wheatMax+" kg";
+    document.getElementById("sugarStock").innerText = stock.sugar+" kg / "+stock.sugarMax+" kg";
+    document.getElementById("oilStock").innerText = stock.oil+" L / "+stock.oilMax+" L";
+    document.getElementById("riceBar").style.width = (stock.rice/stock.riceMax*100)+"%";
+    document.getElementById("wheatBar").style.width = (stock.wheat/stock.wheatMax*100)+"%";
+    document.getElementById("sugarBar").style.width = (stock.sugar/stock.sugarMax*100)+"%";
+    document.getElementById("oilBar").style.width = (stock.oil/stock.oilMax*100)+"%";
+}
+updateStockUI();
+
+/* SEARCH FILTERS */
+function filterUsers(){
+    const input = document.getElementById("userSearch").value.toUpperCase();
+    const users = document.querySelectorAll("#usersList .user-card");
+    users.forEach(u=>{
+        const name = u.querySelector(".user-left div b").innerText.toUpperCase();
+        u.style.display = name.includes(input) ? "flex" : "none";
+    });
+}
+
+function filterTxns(){
+    const input = document.getElementById("txnSearch").value.toUpperCase();
+    const txns = document.querySelectorAll("#historyList .history-card");
+    txns.forEach(t=>{
+        const name = t.querySelector(".history-left div:nth-child(2)").innerText.toUpperCase();
+        t.style.display = name.includes(input) ? "flex" : "none";
+    });
+}
+
+</script>
+</body>
+</html>
