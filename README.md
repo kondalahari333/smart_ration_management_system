@@ -3,7 +3,7 @@
 Smart Ration Distribution System is a digital platform designed to improve the public ration process.it helps in beneficiary data,ration stock and distribution effeciently.THe system ensures transparency,reduces fraud,and allows fair distribution of essential food items to eligible families.This project is now mainly focuses on the frontend design using web technologies.
 This website helps users understand how ration systems work and provides a simple interface for viewing ration details.
 
-#Technologies Used
+<b>#Technologies Used<b>
 *HTML-Structure for the web pages
 *CSS-Styling and layout design
 *javaScript-Basic interactivity and dynamic behaviour
